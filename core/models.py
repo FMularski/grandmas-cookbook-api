@@ -33,19 +33,21 @@ class User(AbstractUser):
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
 
-    TYPE_GRANDMA = "G"
-    TYPE_MEMBER = "M"
+    TYPE_BRONZE = "B"
+    TYPE_SILVER = "S"
+    TYPE_GOLDEN = "G"
 
     TYPE_CHOICES = (
-        (TYPE_GRANDMA, _("Grandma")),
-        (TYPE_MEMBER, _("Member")),
+        (TYPE_BRONZE, _("Bronze")),
+        (TYPE_SILVER, _("Silver")),
+        (TYPE_GOLDEN, _("Golden")),
     )
 
     username = None
     first_name = None
     last_name = None
     email = models.EmailField(unique=True)
-    type = models.CharField(max_length=1, choices=TYPE_CHOICES, default=TYPE_MEMBER)
+    type = models.CharField(max_length=1, choices=TYPE_CHOICES, default=TYPE_BRONZE)
 
     objects = CustomUserManager()
 
