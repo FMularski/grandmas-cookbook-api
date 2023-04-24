@@ -36,17 +36,20 @@ class Recipe(models.Model):
     )
     rating = models.FloatField(default=0, validators=[validate_between_0_and_5])
 
+    def __str__(self):
+        return self.title
+
 
 class Cookbook(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="cookbook")
-    recipes = models.ManyToManyField(Recipe, related_name="cookbooks")
+    recipes = models.ManyToManyField(Recipe, related_name="cookbooks", blank=True)
 
     @property
     def recipes_count(self):
-        return self.cookbooks.all().count()
+        return self.recipes.all().count()
 
     def __str__(self):
-        return _(f"{self.user}'s cookbook")
+        return f"{self.user}'s cookbook"
 
 
 class Ingredient(models.Model):
@@ -75,7 +78,7 @@ class Ingredient(models.Model):
 
 class Instruction(models.Model):
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE, related_name="instructions")
-    order = models.PositiveSmallIntegerField()
+    order = models.PositiveSmallIntegerField(blank=True)
     action = models.CharField(max_length=200)
     tip = models.CharField(max_length=200, null=True, blank=True)
 
