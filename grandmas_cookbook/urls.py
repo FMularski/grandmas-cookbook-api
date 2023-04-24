@@ -16,7 +16,25 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from drf_yasg import openapi
+from drf_yasg.views import get_schema_view
+
+description = """
+Project created as a recruitment task for theBitByBit company.
+"""
+
+schema_view = get_schema_view(
+    openapi.Info(
+        title="Grandma's Cookbook API",
+        default_version="v1",
+        description="Project created as a recruitment task for theBitByBit company.",
+        contact=openapi.Contact(email="mularskif@gmail.com"),
+    ),
+    public=True,
+)
+
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path("admin/", admin.site.urls),
+    path("", schema_view.with_ui("swagger"), name="schema-swagger-ui"),
 ]
