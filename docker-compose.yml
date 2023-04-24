@@ -16,12 +16,14 @@ services:
     build:
       context: .
     command: > 
-      sh -c "python3 manage.py migrate &&
+      sh -c "python3 manage.py collectstatic --noinput &&
+             python3 manage.py migrate &&
              gunicorn grandmas_cookbook.wsgi:application --bind 0.0.0.0:8000 --reload"
     expose:
       - 8000
     volumes:
       - .:/code
+      - static:/code/static
     depends_on:
       db:
         condition: service_healthy
@@ -32,6 +34,10 @@ services:
       - 80:80
     volumes:
       - ./nginx:/etc/nginx/conf.d
+      - static:/home/app/static
     depends_on:
       web:
         condition: service_started
+
+volumes:
+  static:
