@@ -8,7 +8,7 @@ User = get_user_model()
 
 class CustomUserAdmin(UserAdmin):
     fieldsets = (
-        (None, {"fields": ("password",)}),
+        (None, {"fields": ("password", "type")}),
         (_("Personal info"), {"fields": ("email",)}),
         (
             _("Permissions"),
