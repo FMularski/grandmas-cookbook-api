@@ -14,8 +14,8 @@ class Command(BaseCommand):
             )
 
         User.objects.create_superuser("admin@mail.com", "admin", type="G")
-        User.objects.create_user("golden@mail.com", "golden", type="G")
-        User.objects.create_user("silver@mail.com", "silver", type="S")
         User.objects.create_user("bronze@mail.com", "bronze", type="B")
+        User.objects.create_user("silver@mail.com", "silver", type="S")
+        User.objects.create_user("golden@mail.com", "golden", type="G")
 
         self.stdout.write(self.style.SUCCESS("Users loaded."))
