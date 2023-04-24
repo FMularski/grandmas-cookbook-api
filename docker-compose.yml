@@ -7,15 +7,23 @@ services:
       - POSTGRES_DB=postgres
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
   web:
     build:
       context: .
-    command: gunicorn grandmas_cookbook.wsgi:application --bind 0.0.0.0:8000 --reload
+    command: > 
+      sh -c "python3 manage.py migrate &&
+             gunicorn grandmas_cookbook.wsgi:application --bind 0.0.0.0:8000 --reload"
     ports:
       - 8000:8000
     volumes:
       - .:/code
     depends_on:
       db:
-        condition: service_started
+        condition: service_healthy
+
     
