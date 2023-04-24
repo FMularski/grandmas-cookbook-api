@@ -46,7 +46,7 @@ INSTALLED_APPS = [
     "drf_yasg",
     # project apps
     "core.apps.CoreConfig",
-    "cookbooks.apps.CoreConfig",
+    "cookbooks.apps.CookbooksConfig",
 ]
 
 MIDDLEWARE = [
