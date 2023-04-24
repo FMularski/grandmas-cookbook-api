@@ -18,12 +18,20 @@ services:
     command: > 
       sh -c "python3 manage.py migrate &&
              gunicorn grandmas_cookbook.wsgi:application --bind 0.0.0.0:8000 --reload"
-    ports:
-      - 8000:8000
+    expose:
+      - 8000
     volumes:
       - .:/code
     depends_on:
       db:
         condition: service_healthy
-
-    
+  proxy:
+    build:
+      context: ./nginx
+    ports:
+      - 80:80
+    volumes:
+      - ./nginx:/etc/nginx/conf.d
+    depends_on:
+      web:
+        condition: service_started
