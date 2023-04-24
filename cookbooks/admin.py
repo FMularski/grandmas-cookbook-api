@@ -5,7 +5,7 @@ from .models import Cookbook, Ingredient, Instruction, Recipe
 
 
 class CookbookAdmin(ModelAdmin):
-    list_display = "pk", "user", "recipes_count"
+    list_display = "user", "recipes_count"
 
 
 class IngredientInline(TabularInline):
@@ -22,7 +22,7 @@ class InstructionInline(TabularInline):
 
 
 class RecipeAdmin(ModelAdmin):
-    list_display = "pk", "title", "created_by", "rating"
+    list_display = "title", "created_by", "difficulty", "rating"
     ordering = ("-rating",)
     inlines = IngredientInline, InstructionInline
 
