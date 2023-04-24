@@ -8,6 +8,11 @@ class Command(BaseCommand):
     help = "Load sample users."
 
     def handle(self, *args, **options):
+        if User.objects.exists():
+            return self.stdout.write(
+                self.style.WARNING("Some users already exists. Aborting loading sample users.")
+            )
+
         User.objects.create_superuser("admin@mail.com", "admin", type="G")
         User.objects.create_user("golden@mail.com", "golden", type="G")
         User.objects.create_user("silver@mail.com", "silver", type="S")
