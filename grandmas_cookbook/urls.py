@@ -21,13 +21,14 @@ from drf_yasg.views import get_schema_view
 
 description = """
 Project created as a recruitment task for theBitByBit company.
+Created by mularskif@gmail.com
 """
 
 schema_view = get_schema_view(
     openapi.Info(
         title="Grandma's Cookbook API",
         default_version="v1",
-        description="Project created as a recruitment task for theBitByBit company.",
+        description=description,
         contact=openapi.Contact(email="mularskif@gmail.com"),
     ),
     public=True,
