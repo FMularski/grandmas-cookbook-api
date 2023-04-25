@@ -21,6 +21,8 @@ from drf_yasg.views import get_schema_view
 
 description = """
 Project created as a recruitment task. API for browsing and managing cooking recipes.
+Objects can be also inspected at http://localhost/admin/, credentials: e: admin@mail.com p: admin
+
 Created by mularskif@gmail.com
 """
 
