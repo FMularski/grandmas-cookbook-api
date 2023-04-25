@@ -20,7 +20,7 @@ class TokenAPIView(TokenObtainPairView):
 
 class TokenRefreshAPIView(TokenRefreshView):
     @swagger_auto_schema(
-        operation_description="Returnes refreshed access token.",
+        operation_description="Returns refreshed access token.",
         responses={status.HTTP_200_OK: TokenRefreshAPIViewResponseSerializer},
     )
     def post(self, request, *args, **kwargs):
