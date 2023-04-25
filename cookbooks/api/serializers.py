@@ -117,14 +117,14 @@ class RecipeSerializer(serializers.ModelSerializer):
                 instruction_db.delete()
 
     def update(self, instance, validated_data):
-        ingredients = validated_data.pop("ingredients")
-        instructions = validated_data.pop("instructions")
+        if "ingredients" in validated_data:
+            ingredients = validated_data.pop("ingredients")
+            self._update_ingredients(instance, ingredients)
+        if "instructions" in validated_data:
+            instructions = validated_data.pop("instructions")
+            self._update_instructions(instance, instructions)
 
         Recipe.objects.filter(pk=instance.pk).update(**validated_data)
-
-        self._update_ingredients(instance, ingredients)
-        self._update_instructions(instance, instructions)
-
         return Recipe.objects.get(pk=instance.pk)
 
 
