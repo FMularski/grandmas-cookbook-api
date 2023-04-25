@@ -20,7 +20,7 @@ from drf_yasg import openapi
 from drf_yasg.views import get_schema_view
 
 description = """
-Project created as a recruitment task for theBitByBit company.
+Project created as a recruitment task. API for browsing and managing cooking recipes.
 Created by mularskif@gmail.com
 """
 
