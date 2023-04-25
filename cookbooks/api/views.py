@@ -59,7 +59,7 @@ class RecipeListAPIView(generics.ListCreateAPIView):
         return []
 
 
-class RecipeRetrieveAPIView(generics.RetrieveAPIView):
+class RecipeDetailAPIView(generics.RetrieveDestroyAPIView):
     serializer_class = ReadonlyRecipeSerializer
     queryset = Recipe.objects.all()
 
@@ -68,6 +68,33 @@ class RecipeRetrieveAPIView(generics.RetrieveAPIView):
     )
     def get(self, request, *args, **kwargs):
         return super().get(request, *args, **kwargs)
+
+    @swagger_auto_schema(
+        operation_description="Deletes a recipe with the specified id (SU only).",
+        manual_parameters=[
+            openapi.Parameter(
+                "Authorization",
+                openapi.IN_HEADER,
+                type=openapi.TYPE_STRING,
+                default="Bearer <access>",
+            )
+        ],
+    )
+    def delete(self, request, *args, **kwargs):
+        return super().delete(request, *args, **kwargs)
+
+    def get_authenticators(self):
+        if self.request.method == "DELETE":
+            return [auth() for auth in [JWTAuthentication]]
+        return []
+
+    def get_permissions(self):
+        if self.request.method == "DELETE":
+            return [
+                permission()
+                for permission in [permissions.IsAuthenticated, permissions.IsAdminUser]
+            ]
+        return []
 
 
 class MyCookbookAPIView(generics.RetrieveAPIView):
