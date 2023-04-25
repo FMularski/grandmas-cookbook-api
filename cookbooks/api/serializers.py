@@ -1,7 +1,7 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
-from cookbooks.models import Ingredient, Instruction, Recipe
+from cookbooks.models import Cookbook, Ingredient, Instruction, Recipe
 
 User = get_user_model()
 
@@ -37,3 +37,12 @@ class RecipeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Recipe
         fields = "__all__"
+
+
+class CookbookSerializer(serializers.ModelSerializer):
+    recipes = RecipeSerializer(many=True)
+    recipes_count = serializers.IntegerField()
+
+    class Meta:
+        model = Cookbook
+        fields = "id", "recipes_count", "recipes"
