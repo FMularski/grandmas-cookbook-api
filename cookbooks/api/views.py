@@ -16,11 +16,12 @@ class RecipeListAPIView(generics.ListAPIView):
         return Recipe.objects.all().order_by(f"-{order}") if order else Recipe.objects.all()
 
     @swagger_auto_schema(
+        operation_description="Returns the list of all available recipes.",
         manual_parameters=[
             openapi.Parameter(
                 "order", openapi.IN_QUERY, type=openapi.TYPE_STRING, enum=["rating", "created_at"]
             )
-        ]
+        ],
     )
     def get(self, request, *args, **kwargs):
         return super().get(request, *args, **kwargs)

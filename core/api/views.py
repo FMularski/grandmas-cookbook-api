@@ -10,12 +10,18 @@ from .serializers import TokenAPIViewResponseSerializer, TokenRefreshAPIViewResp
 
 
 class TokenAPIView(TokenObtainPairView):
-    @swagger_auto_schema(responses={status.HTTP_200_OK: TokenAPIViewResponseSerializer})
+    @swagger_auto_schema(
+        operation_description="Returns JWT tokens and custom user's type.",
+        responses={status.HTTP_200_OK: TokenAPIViewResponseSerializer},
+    )
     def post(self, request, *args, **kwargs):
         return super().post(request, *args, **kwargs)
 
 
 class TokenRefreshAPIView(TokenRefreshView):
-    @swagger_auto_schema(responses={status.HTTP_200_OK: TokenRefreshAPIViewResponseSerializer})
+    @swagger_auto_schema(
+        operation_description="Returnes refreshed access token.",
+        responses={status.HTTP_200_OK: TokenRefreshAPIViewResponseSerializer},
+    )
     def post(self, request, *args, **kwargs):
         return super().post(request, *args, **kwargs)
