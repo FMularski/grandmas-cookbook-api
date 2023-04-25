@@ -1,6 +1,8 @@
 import itertools
 
 from django.contrib.auth import get_user_model
+from django.db.utils import IntegrityError
+from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from cookbooks.models import Cookbook, Ingredient, Instruction, Recipe
@@ -96,8 +98,13 @@ class RecipeSerializer(serializers.ModelSerializer):
                 Ingredient.objects.filter(pk=ingredient_db.pk).update(**ingredient_data)
                 continue
             if ingredient_data and not ingredient_db:
-                Ingredient.objects.create(**(ingredient_data | {"recipe": instance}))
-                continue
+                # check when PATCH with insufficient fields data
+                try:
+                    Ingredient.objects.create(**(ingredient_data | {"recipe": instance}))
+                except IntegrityError:
+                    raise serializers.ValidationError(_("Insufficient data."))
+                finally:
+                    continue
             if not ingredient_data and ingredient_db:
                 ingredient_db.delete()
 
@@ -111,8 +118,12 @@ class RecipeSerializer(serializers.ModelSerializer):
                 Instruction.objects.filter(pk=instruction_db.pk).update(**instruction_data)
                 continue
             if instruction_data and not instruction_db:
-                Instruction.objects.create(**(instruction_data | {"recipe": instance}))
-                continue
+                try:
+                    Instruction.objects.create(**(instruction_data | {"recipe": instance}))
+                except IntegrityError:
+                    raise serializers.ValidationError(_("Insufficient data."))
+                finally:
+                    continue
             if not instruction_data and instruction_db:
                 instruction_db.delete()
 
