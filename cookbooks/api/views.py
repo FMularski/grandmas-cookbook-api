@@ -59,8 +59,7 @@ class RecipeListAPIView(generics.ListCreateAPIView):
         return []
 
 
-class RecipeDetailAPIView(generics.RetrieveDestroyAPIView):
-    serializer_class = ReadonlyRecipeSerializer
+class RecipeDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Recipe.objects.all()
 
     @swagger_auto_schema(
@@ -83,8 +82,43 @@ class RecipeDetailAPIView(generics.RetrieveDestroyAPIView):
     def delete(self, request, *args, **kwargs):
         return super().delete(request, *args, **kwargs)
 
+    update_desctiption = "Updates a recipe with the specified id (SU or object creator only)."
+
+    @swagger_auto_schema(
+        operation_description=update_desctiption,
+        manual_parameters=[
+            openapi.Parameter(
+                "Authorization",
+                openapi.IN_HEADER,
+                type=openapi.TYPE_STRING,
+                default="Bearer <access>",
+            )
+        ],
+    )
+    def put(self, request, *args, **kwargs):
+        return super().put(request, *args, **kwargs)
+
+    @swagger_auto_schema(
+        operation_description=update_desctiption,
+        manual_parameters=[
+            openapi.Parameter(
+                "Authorization",
+                openapi.IN_HEADER,
+                type=openapi.TYPE_STRING,
+                default="Bearer <access>",
+            )
+        ],
+    )
+    def patch(self, request, *args, **kwargs):
+        return super().patch(request, *args, **kwargs)
+
+    def get_serializer_class(self):
+        if self.request.method in ["PUT", "PATCH", "DELETE"]:
+            return RecipeSerializer
+        return ReadonlyRecipeSerializer
+
     def get_authenticators(self):
-        if self.request.method == "DELETE":
+        if self.request.method in ["PUT", "PATCH", "DELETE"]:
             return [auth() for auth in [JWTAuthentication]]
         return []
 
@@ -93,6 +127,13 @@ class RecipeDetailAPIView(generics.RetrieveDestroyAPIView):
             return [
                 permission()
                 for permission in [permissions.IsAuthenticated, permissions.IsAdminUser]
+            ]
+        elif self.request.method in ["PUT", "PATCH"]:
+            return [
+                permission()
+                for permission in [
+                    permissions.IsAuthenticated,
+                ]  # isCreator or isAdminUser
             ]
         return []
 

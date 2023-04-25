@@ -1,3 +1,5 @@
+import itertools
+
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
@@ -81,6 +83,49 @@ class RecipeSerializer(serializers.ModelSerializer):
         recipe.instructions.add(*instructions)
 
         return recipe
+
+    def _update_ingredients(self, instance, ingredients_data):
+        ingredients_db = instance.ingredients.all()
+        # iterate over zipped collection, check on which side (data or db) the object is missing,
+        # even => update in parallel;
+        # missing on db => need more db; missing on data => need less db
+        for ingredient_data, ingredient_db in itertools.zip_longest(
+            ingredients_data, ingredients_db
+        ):
+            if ingredient_data and ingredient_db:
+                Ingredient.objects.filter(pk=ingredient_db.pk).update(**ingredient_data)
+                continue
+            if ingredient_data and not ingredient_db:
+                Ingredient.objects.create(**(ingredient_data | {"recipe": instance}))
+                continue
+            if not ingredient_data and ingredient_db:
+                ingredient_db.delete()
+
+    def _update_instructions(self, instance, instructions_data):
+        instructions_db = instance.instructions.all()
+        # same logic as in _update_ingredients
+        for instruction_data, instruction_db in itertools.zip_longest(
+            instructions_data, instructions_db
+        ):
+            if instruction_data and instruction_db:
+                Instruction.objects.filter(pk=instruction_db.pk).update(**instruction_data)
+                continue
+            if instruction_data and not instruction_db:
+                Instruction.objects.create(**(instruction_data | {"recipe": instance}))
+                continue
+            if not instruction_data and instruction_db:
+                instruction_db.delete()
+
+    def update(self, instance, validated_data):
+        ingredients = validated_data.pop("ingredients")
+        instructions = validated_data.pop("instructions")
+
+        Recipe.objects.filter(pk=instance.pk).update(**validated_data)
+
+        self._update_ingredients(instance, ingredients)
+        self._update_instructions(instance, instructions)
+
+        return Recipe.objects.get(pk=instance.pk)
 
 
 class ReadonlyCookbookSerializer(serializers.ModelSerializer):
