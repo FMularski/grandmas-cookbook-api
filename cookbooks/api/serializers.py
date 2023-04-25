@@ -6,13 +6,19 @@ from cookbooks.models import Cookbook, Ingredient, Instruction, Recipe
 User = get_user_model()
 
 
-class InstructionSerializer(serializers.ModelSerializer):
+class ReadonlyInstructionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Instruction
         fields = "order", "action", "tip"
 
 
-class IngredientSerializer(serializers.ModelSerializer):
+class InstructionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Instruction
+        exclude = "id", "recipe"
+
+
+class ReadonlyIngredientSerializer(serializers.ModelSerializer):
     amount_unit = serializers.SerializerMethodField("amount_unit_name")
 
     def amount_unit_name(self, obj):
@@ -25,9 +31,15 @@ class IngredientSerializer(serializers.ModelSerializer):
         fields = "name", "amount", "amount_unit"
 
 
-class RecipeSerializer(serializers.ModelSerializer):
-    ingredients = IngredientSerializer(many=True)
-    instructions = InstructionSerializer(many=True)
+class IngredientSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Ingredient
+        exclude = "id", "recipe"
+
+
+class ReadonlyRecipeSerializer(serializers.ModelSerializer):
+    ingredients = ReadonlyIngredientSerializer(many=True)
+    instructions = ReadonlyInstructionSerializer(many=True)
     difficulty = serializers.SerializerMethodField("difficulty_name")
     created_by = serializers.ReadOnlyField(source=f"created_by.{User.USERNAME_FIELD}")
 
@@ -39,8 +51,40 @@ class RecipeSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class CookbookSerializer(serializers.ModelSerializer):
-    recipes = RecipeSerializer(many=True)
+class RecipeSerializer(serializers.ModelSerializer):
+    ingredients = IngredientSerializer(many=True)
+    instructions = InstructionSerializer(many=True)
+
+    class Meta:
+        model = Recipe
+        exclude = ("created_by",)
+
+    def create(self, validated_data):
+        ingredients = validated_data.pop("ingredients")
+        instructions = validated_data.pop("instructions")
+        created_by = self.context["request"].user
+
+        recipe = Recipe.objects.create(**(validated_data | {"created_by": created_by}))
+
+        ingredients = [
+            Ingredient(**(ingredient_data | {"recipe": recipe})) for ingredient_data in ingredients
+        ]
+        ingredients = Ingredient.objects.bulk_create(ingredients)
+        recipe.ingredients.add(*ingredients)
+
+        # override ordering by 1, 2, 3...
+        instructions = [
+            Instruction(**(instruction_data | {"recipe": recipe, "order": order}))
+            for order, instruction_data in enumerate(instructions, start=1)
+        ]
+        instructions = Instruction.objects.bulk_create(instructions)
+        recipe.instructions.add(*instructions)
+
+        return recipe
+
+
+class ReadonlyCookbookSerializer(serializers.ModelSerializer):
+    recipes = ReadonlyRecipeSerializer(many=True)
     recipes_count = serializers.IntegerField()
 
     class Meta:
