@@ -142,3 +142,5 @@ AUTH_USER_MODEL = "core.User"
 SIMPLE_JWT = {
     "TOKEN_OBTAIN_SERIALIZER": "core.api.serializers.CustomTokenObtainPairSerializer",
 }
+
+SWAGGER_SETTINGS = {"SECURITY_DEFINITIONS": None}
