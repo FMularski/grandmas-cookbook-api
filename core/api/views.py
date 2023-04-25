@@ -10,8 +10,18 @@ from .serializers import TokenAPIViewResponseSerializer, TokenRefreshAPIViewResp
 
 
 class TokenAPIView(TokenObtainPairView):
+    token_apiview_description = """
+        Returns JWT tokens and custom user's type.
+
+        Credentials for testing purposes:
+        * e: admin@mail.com p: admin (SU)
+        * e: golden@mail.com p: golden
+        * e: silver@mail.com p: silver
+        * e: bronze@mail.com p: bronze
+    """
+
     @swagger_auto_schema(
-        operation_description="Returns JWT tokens and custom user's type.",
+        operation_description=token_apiview_description,
         responses={status.HTTP_200_OK: TokenAPIViewResponseSerializer},
     )
     def post(self, request, *args, **kwargs):
