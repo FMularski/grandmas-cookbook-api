@@ -27,6 +27,17 @@ class RecipeListAPIView(generics.ListAPIView):
         return super().get(request, *args, **kwargs)
 
 
+class RecipeRetrieveAPIView(generics.RetrieveAPIView):
+    serializer_class = RecipeSerializer
+    queryset = Recipe.objects.all()
+
+    @swagger_auto_schema(
+        operation_description="Returns a recipe object with the specified id.",
+    )
+    def get(self, request, *args, **kwargs):
+        return super().get(request, *args, **kwargs)
+
+
 class MyCookbookAPIView(generics.RetrieveAPIView):
     serializer_class = CookbookSerializer
     authentication_classes = [JWTAuthentication]
