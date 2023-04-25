@@ -4,6 +4,7 @@ from rest_framework import generics, permissions
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
 from cookbooks.models import Recipe
+from cookbooks.permissions import IsRecipeCreatorOrAdminPermission
 
 from .serializers import ReadonlyCookbookSerializer, ReadonlyRecipeSerializer, RecipeSerializer
 
@@ -133,7 +134,8 @@ class RecipeDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
                 permission()
                 for permission in [
                     permissions.IsAuthenticated,
-                ]  # isCreator or isAdminUser
+                    IsRecipeCreatorOrAdminPermission,
+                ]
             ]
         return []
 
