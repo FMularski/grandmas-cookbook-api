@@ -46,3 +46,13 @@ http://localhost/admin
 SU credentials:
 email: admin@mail.com
 password: admin
+
+## 🍳 Testing
+The code can be tested by executing in the web app container:
+```bash
+pytest
+```
+or (if you want some extra coverage info):
+```bash
+pytest --cov=cookbooks/tests/
+```
